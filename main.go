@@ -57,6 +57,7 @@ func calculateMonthsPassed(receiptDate time.Time) int {
 
 // Handler for the interest calculator
 func interestCalculatorHandler(w http.ResponseWriter, r *http.Request) {
+	// Parse the template
 	tmpl := template.Must(template.ParseFiles("templates/index.html"))
 	data := Result{}
 
@@ -92,6 +93,7 @@ func interestCalculatorHandler(w http.ResponseWriter, r *http.Request) {
 		data.TotalDue = math.Round(totalDue*100) / 100 // Round to 2 decimal places
 	}
 
+	// Render the template with the calculated data or error
 	tmpl.Execute(w, data)
 }
 
