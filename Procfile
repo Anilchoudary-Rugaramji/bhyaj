@@ -1,2 +1,2 @@
-web: ./bhyaj/main.go
+web: ./bhyaj
 
