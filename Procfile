@@ -1,2 +1,2 @@
-web: ./main.exe
+web: ./main
 
