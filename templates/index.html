@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>भयाज कैलकुलेटर / Bhaj Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f7;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-top: 50px;
+        }
+
+        form {
+            width: 40%;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            font-size: 18px;
+            color: #333;
+            display: block;
+            margin: 10px 0 5px;
+        }
+
+        input[type="text"],
+        input[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+
+        input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+
+        hr {
+            border: 0;
+            border-top: 1px solid #ccc;
+            margin: 20px 0;
+        }
+
+        .result {
+            text-align: center;
+            font-size: 18px;
+            margin-top: 20px;
+        }
+
+        .error {
+            color: red;
+            text-align: center;
+            font-size: 18px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>भयाज कैलकुलेटर / Bhaj Calculator</h1>
+
+    <form method="post">
+        <!-- Receipt Date Label (Hindi + English) -->
+        <label for="receipt_date">रसीद तिथि (DD.MM.YYYY प्रारूप) / Receipt Date (DD.MM.YYYY Format):</label>
+        <input type="text" id="receipt_date" name="receipt_date" required><br>
+
+        <!-- Amount Label (Hindi + English) -->
+        <label for="amount">रकम / Amount:</label>
+        <input type="text" id="amount" name="amount" required><br>
+
+        <input type="submit" value="हिसाब करें / Calculate">
+    </form>
+
+    <!-- Error Message -->
+    {{if .Error}}
+    <p class="error">{{.Error}}</p>
+    {{else}}
+    <!-- Result Section (Months Passed and Total Due) -->
+    {{if .MonthsPassed}}
+    <hr>
+    <div class="result">
+        <h2>परिणाम / Result:</h2>
+        <p>कुल महीने बीते / Months Passed: {{.MonthsPassed}}</p>
+        <p>कुल रकम / Total Due: ₹{{.TotalDue}}</p>
+    </div>
+    {{end}}
+    {{end}}
+
+</body>
+
+</html>
