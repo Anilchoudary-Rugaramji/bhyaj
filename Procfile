@@ -1,2 +1,2 @@
-web: ./bhyaj
+web: ./BHYAJ
 
