@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"html/template"
-	"math"
 	"net/http"
 	"strconv"
 	"strings"
@@ -25,6 +24,10 @@ func parseFlexibleDate(inputDate string) (time.Time, error) {
 		"2-1-06", "02-01-2006", // 3-2-21, 03-02-2021
 		"2/1/06", "02/01/2006", // 3/2/21, 03/02/2021
 		"2 1 06", "02 01 2006", // 3 2 21, 03 02 2021
+		"2.1.06", "02.01.2006", // 12.2.22, 12.02.2022, etc
+		"02.02.2022", "12.02.2022", // Add more variations
+		"2.2.2022", "12.2.2022", // More formats like 12.2.22
+		"2.2.22", "12.02.22", // Another common format
 	}
 
 	inputDate = strings.TrimSpace(inputDate)
@@ -85,12 +88,16 @@ func interestCalculatorHandler(w http.ResponseWriter, r *http.Request) {
 		// Calculate months passed using the new logic
 		monthsPassed := calculateMonthsPassed(receiptDate)
 
-		// Calculate total due with 3% monthly interest
-		totalDue := amount * math.Pow(1.03, float64(monthsPassed))
+		// Simple Interest: 3% per month
+		interestRate := 0.03
+		totalInterest := float64(monthsPassed) * interestRate * amount
+
+		// Calculate total due with simple interest
+		totalDue := amount + totalInterest
 
 		// Populate the results
 		data.MonthsPassed = monthsPassed
-		data.TotalDue = math.Round(totalDue*100) / 100 // Round to 2 decimal places
+		data.TotalDue = totalDue // No rounding required for simple interest
 	}
 
 	// Render the template with the calculated data or error
