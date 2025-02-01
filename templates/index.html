@@ -4,108 +4,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>भयाज कैलकुलेटर / Bhyaj Calculator</title>
+    <title>Bhyaj Calculator / ब्याज कैलकुलेटर</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f7f7f7;
-            margin: 0;
-            padding: 0;
+        .input-container {
+            position: relative;
         }
 
-        h1 {
-            text-align: center;
-            color: #333;
-            margin-top: 50px;
-        }
-
-        form {
-            width: 40%;
-            margin: 0 auto;
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        label {
-            font-size: 18px;
-            color: #333;
-            display: block;
-            margin: 10px 0 5px;
-        }
-
-        input[type="text"],
-        input[type="submit"] {
-            width: 100%;
-            padding: 10px;
+        #startDate {
             font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            margin-bottom: 15px;
-        }
-
-        input[type="submit"] {
-            background-color: #4CAF50;
-            color: white;
-            cursor: pointer;
-        }
-
-        input[type="submit"]:hover {
-            background-color: #45a049;
-        }
-
-        hr {
-            border: 0;
-            border-top: 1px solid #ccc;
-            margin: 20px 0;
-        }
-
-        .result {
-            text-align: center;
-            font-size: 18px;
-            margin-top: 20px;
-        }
-
-        .error {
-            color: red;
-            text-align: center;
-            font-size: 18px;
         }
     </style>
 </head>
 
-<body>
-
-    <h1>भयाज कैलकुलेटर / Bhyaj Calculator</h1>
-
-    <form method="post">
-        <!-- Receipt Date Label (Hindi + English) -->
-        <label for="receipt_date">रसीद तिथि (DD.MM.YYYY प्रारूप) / Receipt Date (DD.MM.YYYY Format):</label>
-        <input type="text" id="receipt_date" name="receipt_date" required><br>
-
-        <!-- Amount Label (Hindi + English) -->
-        <label for="amount">रकम / Amount:</label>
-        <input type="text" id="amount" name="amount" required><br>
-
-        <input type="submit" value="हिसाब करें / Calculate">
+<body class="container mt-5">
+    <h2 class="text-center">Bhyaj Calculator / ब्याज कैलकुलेटर</h2>
+    <form id="interestForm" class="mt-4">
+        <div class="mb-3 input-container">
+            <label for="startDate" class="form-label">Receipt Date / रसीद तारीख:</label>
+            <input type="text" class="form-control" id="startDate" placeholder="DD.MM.YYYY" required>
+            <small class="text-muted">Enter date as DDMMYYYY (e.g. 12022024 → 12.02.2024)</small>
+        </div>
+        <div class="mb-3">
+            <label for="rate" class="form-label">Interest Rate (% per month) / ब्याज दर (% प्रति माह):</label>
+            <select class="form-select" id="rate">
+                <option value="3" selected>3%</option>
+                <option value="2.5">2.5%</option>
+                <option value="2">2%</option>
+            </select>
+            <input type="number" step="0.01" class="form-control mt-2" id="customRate"
+                placeholder="Or enter custom rate / या कस्टम दर दर्ज करें">
+        </div>
+        <div class="mb-3">
+            <label for="amount" class="form-label">Amount (₹) / राशि (₹):</label>
+            <input type="number" class="form-control" id="amount" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Calculate / कैलकुलेट करें</button>
+        <button type="button" class="btn btn-secondary" id="resetBtn">Reset / रीसेट करें</button>
     </form>
+    <div class="mt-4" id="result"></div>
 
-    <!-- Error Message -->
-    {{if .Error}}
-    <p class="error">{{.Error}}</p>
-    {{else}}
-    <!-- Result Section (Months Passed and Total Due) -->
-    {{if .MonthsPassed}}
-    <hr>
-    <div class="result">
-        <h2>परिणाम / Result:</h2>
-        <p>कुल महीने बीते / Months Passed: {{.MonthsPassed}}</p>
-        <p>कुल रकम / Total Due: ₹{{.TotalDue}}</p>
-    </div>
-    {{end}}
-    {{end}}
+    <script>
+        // Auto-format date input
+        function formatDate(inputDate) {
+            let date = inputDate.replace(/[^0-9]/g, ""); // Remove non-numeric characters
+            if (date.length > 2 && date.length <= 4) {
+                date = date.substring(0, 2) + "." + date.substring(2);
+            }
+            if (date.length > 4) {
+                date = date.substring(0, 2) + "." + date.substring(2, 4) + "." + date.substring(4, 8);
+            }
+            return date;
+        }
 
+        document.getElementById("startDate").addEventListener("input", function () {
+            this.value = formatDate(this.value);
+        });
+
+        // Submit form
+        document.getElementById("interestForm").addEventListener("submit", function (event) {
+            event.preventDefault();
+            const startDate = document.getElementById("startDate").value;
+            let rate = document.getElementById("rate").value;
+            const customRate = document.getElementById("customRate").value;
+            const amount = document.getElementById("amount").value;
+            if (customRate) rate = customRate;
+
+            fetch("http://localhost:8080/calculate", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ amount: parseFloat(amount), rate: parseFloat(rate), start_date: startDate })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        document.getElementById("result").innerHTML = `<div class='alert alert-danger'>${data.error}</div>`;
+                    } else {
+                        let monthlyInterest = (parseFloat(amount) * parseFloat(rate)) / 100;
+
+                        document.getElementById("result").innerHTML = `
+                        <div class='alert alert-success'>
+                            <h4>Monthly Interest / प्रति माह ब्याज: ₹${monthlyInterest.toFixed(2)}</h4>
+                            <h4>Total Months / कुल महीन्या: <b>${data.months}</b></h4>
+                            <h2><b>Final Amount / अंतिम रक्म: ₹${data.finalAmount.toFixed(2)}</b></h2>
+                        </div>`;
+                    }
+                })
+                .catch(error => console.error("Error:", error));
+        });
+
+        document.getElementById("resetBtn").addEventListener("click", function () {
+            document.getElementById("interestForm").reset();
+            document.getElementById("result").innerHTML = "";
+        });
+    </script>
 </body>
 
 </html>
