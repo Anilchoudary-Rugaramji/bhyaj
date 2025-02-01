@@ -70,7 +70,7 @@
             const amount = document.getElementById("amount").value;
             if (customRate) rate = customRate;
 
-            fetch("http://localhost:8080/calculate", {
+            fetch("https://bhyaj.onrender.com/calculate", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ amount: parseFloat(amount), rate: parseFloat(rate), start_date: startDate })
